@@ -16,6 +16,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install gettext to be able to use envsubst
+        run: |
+          apt install gettext-base
+          
       - name: Run Unit Tests
         run: |
           chmod +x ./tests/run_tests.sh
