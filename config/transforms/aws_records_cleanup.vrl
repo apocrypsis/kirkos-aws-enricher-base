@@ -1,0 +1,38 @@
+# This only applies if we have unnested individual JSON objects 
+# within a Records field.
+if exists(.Records) && is_object(.Records) {
+  # Handle SNS wrapping over GuardDuty/other logs.
+  if exists(.Records.Sns) {
+    inner_msg = string!(.Records.Sns.Message)
+    del(.Records)
+
+    if starts_with(inner_msg, "{") && ends_with(inner_msg, "}") {
+      parsed_inner, err = parse_json(inner_msg)
+      if err == null {
+        . = merge!(., parsed_inner)
+      }
+    } 
+  } 
+  # Handle standard native CloudTrail logs.
+  else {
+    single_record = .Records
+    del(.Records)
+    . = merge!(., single_record)
+  }
+}
+
+# EventBridge GuardDuty wrapper.
+if exists(."detail-type") && string!(."detail-type") == "GuardDuty Finding" && 
+    exists(.source) && string!(.source) == "aws.guardduty" && 
+    exists(.detail) && is_object(.detail) {
+  detail_object = .detail
+  del(.detail)
+  . = merge!(., detail_object)
+}
+
+# GuardDuty logs obtained via API.
+if exists(.Findings) && is_object(.Findings) {
+  single_record = .Findings
+  del(.Findings)
+  . = merge!(., single_record)
+}

@@ -1,0 +1,6 @@
+pipeline:
+  run-unit-tests:
+    image: timberio/vector:0.60.0-debian
+    commands:
+      - chmod +x ./tests/run_tests.sh
+      - ./tests/run_tests.sh 

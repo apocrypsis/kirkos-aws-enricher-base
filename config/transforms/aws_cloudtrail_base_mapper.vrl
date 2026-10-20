@@ -1,0 +1,8 @@
+# Information about principals.
+_intel.identity.actor.id = .userIdentity.principalId
+_intel.identity.actor.name = .userIdentity.userName
+
+# Information about IPs/ASNs etc
+if .sourceIPAddress != "AWS Internal" {
+  _intel.network.source.ip = .sourceIPAddress
+}

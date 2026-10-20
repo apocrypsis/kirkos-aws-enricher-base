@@ -1,0 +1,20 @@
+tests:
+  - name: ': Parse CloudTrail Records Array'
+    input:
+      insert_at: 'aws_raw_log_parser'
+      type: 'raw'
+      value: '${CLOUDTRAIL_RECORDS_ARRAY}'
+    outputs:
+      - extract_from: 'aws_log_classifier'
+        conditions: 
+          - type: 'vrl'
+            # Our VRL assertions for the test output.
+            source: |
+              assert_eq!(._intel.log.source, "cloudtrail", "incorrect log source")
+              assert!(exists(.requestParameters.instanceId), "no instance id field provided")
+              if (.eventID == "a2c8c1a9-7483-475a-b240-cb8258c7363f") {
+                assert_eq!(.requestParameters.instanceId, "i-0123456789abcdef0", "incorrect instance id")
+              } else if (.eventID == "d91efe63-e7fb-41a5-a879-d3bd67603b80") {
+                assert_eq!(.requestParameters.instanceId, "i-9123456789abedef0", "incorrect instance id")
+              }
+              assert!(!exists(.message))

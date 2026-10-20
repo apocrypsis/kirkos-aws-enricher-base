@@ -1,0 +1,15 @@
+tests:
+  - name: ': Parse Individual CloudTrail Log'
+    input:
+      insert_at: 'aws_raw_log_parser'
+      type: 'raw'
+      value: '${CLOUDTRAIL_SINGLE_LOG}'
+    outputs:
+      - extract_from: 'aws_log_classifier'
+        conditions: 
+          - type: 'vrl'
+            # Our VRL assertions for the test output.
+            source: |
+              assert_eq!(._intel.log.source, "cloudtrail", "incorrect log source")
+              assert_eq!(.eventName, "SendSSHPublicKey", "incorrect event name")
+              assert!(!exists(.message))

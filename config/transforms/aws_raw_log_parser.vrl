@@ -1,0 +1,31 @@
+# Only process string parsing if .message actually exists (handles pre-parsed vector sources)
+if exists(.message) {
+  raw_msg = string!(.message)
+
+  # Handle JSON strings
+  if starts_with(raw_msg, "{") && ends_with(raw_msg, "}") {
+    parsed, err = parse_json(raw_msg)
+    if err == null {
+      del(.message) # Prevent field conflicts safely
+      . = merge!(., parsed)
+    }
+  } 
+  # Handle raw space-delimited text VPC logs. 
+  else {
+    parsed_vpc, vpc_err = parse_aws_vpc_flow_log(raw_msg)
+    if vpc_err == null {
+      del(.message)
+      . = merge(., parsed_vpc)
+    }
+  }
+}
+
+# Unnest Records field. This creates cloned independent event slices.
+if exists(.Records) && is_array(.Records) {
+  . = unnest!(.Records)
+}
+
+# Unnest Findings field.
+if exists(.Findings) && is_array(.Findings) {
+  . = unnest!(.Findings)
+}

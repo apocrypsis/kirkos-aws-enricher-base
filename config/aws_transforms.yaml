@@ -1,0 +1,76 @@
+# Enable end-to-end ACKs.
+acknowledgements:
+  enabled: true
+
+sources:
+  aws_input:
+    type: 'vector'
+    address: '${LISTENER_IP}:${LISTENER_PORT}'
+
+transforms:
+  # Convert logs to JSON if appropriate and extract individual logs from array.
+  aws_raw_log_parser:
+    type: 'remap'
+    inputs: 
+      - 'aws_input'
+    file: 'config/transforms/aws_raw_log_parser.vrl'
+
+  # Handle logs within `Records`.
+  aws_records_cleanup:
+    type: 'remap'
+    inputs: 
+      - 'aws_raw_log_parser'
+    file: 'config/transforms/aws_records_cleanup.vrl'
+
+  # Classify logs as CloudTrail, GuardDuty, etc.
+  aws_log_classifier:
+    type: 'remap'
+    inputs: 
+      - 'aws_records_cleanup'
+    file: 'config/transforms/aws_log_classifier.vrl' 
+  
+  # Route logs based on their type.
+  # Support only CloudTrail for now.
+  aws_primary_log_router:
+    type: 'exclusive_route'
+    inputs: 
+      - 'common_field_mapper'
+    routes:
+      - name: 'cloudtrail'
+        condition: |
+          ._intel.log.source == "cloudtrail"
+
+  # Every cloudtrail log needs to have some base mappings.
+  aws_cloudtrail_base_mapper:
+    type: 'remap'
+    inputs: 
+      - 'aws_primary_log_router.cloudtrail'
+    file: 'config/transforms/aws_cloudtrail_base_mapper.vrl'
+
+  # Not really used. Just here to demonstrate possibilities.
+  aws_cloudtrail_router:
+    type: 'exclusive_route'
+    inputs:
+      - 'aws_cloudtrail_base_mapper'
+    routes:
+      - name: 's3'
+        condition: '_intel.cloud.service.name == "s3"'
+
+  # Name all secondary mappers to satisfy the pattern aws_cloudtrail_mapper_*
+  # so that they can be captured by the sink without having to manually type them out.
+  # Note that we deliberately name the base mapper to NOT follow this pattern,
+  # because the sink shouldn't capture routed events from base mapper directly.
+  aws_cloudtrail_mapper_s3:
+    type: 'remap'
+    inputs:
+      - 'aws_cloudtrail_router.s3'
+    file: 'config/transforms/aws_cloudtrail_s3_mapper.vrl'
+
+sinks:
+  aws_transformed_output:
+    inputs:
+      - 'aws_cloudtrail_mapper_*'
+      - 'aws_primary_log_router._unmatched'
+      - 'aws_cloudtrail_router._unmatched'
+    type: 'vector'
+    address: '${NEXT_HOP_IP_PORT}'

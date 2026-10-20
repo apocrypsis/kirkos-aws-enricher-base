@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "2.0",
+  "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+  "accountId": "123456789012",
+  "region": "us-east-1",
+  "partition": "aws",
+  "arn": "arn:aws:guardduty:us-east-1:123456789012:detector/1111111122222222/finding/a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+  "type": "UnauthorizedAccess:EC2/TorIPCaller",
+  "resource": {
+    "resourceType": "Instance",
+    "instanceDetails": {
+      "instanceId": "i-99999999999999999",
+      "instanceType": "m5.large",
+      "launchTime": "2026-10-20T12:00:00Z",
+      "platform": null,
+      "productCodes": [],
+      "iamInstanceProfile": {
+        "arn": "arn:aws:iam::123456789012:instance-profile/EC2-Default-Profile",
+        "id": "AIPAIKKITUSBBECEXAMPLE"
+      },
+      "networkInterfaces": [
+        {
+          "ipv6Addresses": [],
+          "networkInterfaceId": "eni-00000000000000000",
+          "privateDnsName": "ip-10-0-0-1.ec2.internal",
+          "privateIpAddress": "10.0.0.1",
+          "privateIpAddresses": [
+            {
+              "privateDnsName": "ip-10-0-0-1.ec2.internal",
+              "privateIpAddress": "10.0.0.1"
+            }
+          ],
+          "publicDnsName": "://amazonaws.com",
+          "publicIp": "54.0.0.1",
+          "securityGroups": [
+            {
+              "groupId": "sg-00000000000000000",
+              "groupName": "default"
+            }
+          ],
+          "subnetId": "subnet-00000000000000000",
+          "vpcId": "vpc-00000000000000000"
+        }
+      ],
+      "tags": [
+        {
+          "key": "Environment",
+          "value": "Production"
+        }
+      ],
+      "instanceState": "running",
+      "availabilityZone": "us-east-1a",
+      "imageId": "ami-00000000000000000"
+    }
+  },
+  "service": {
+    "serviceName": "guardduty",
+    "detectorId": "1111111122222222",
+    "action": {
+      "actionType": "NETWORK_CONNECTION",
+      "networkConnectionAction": {
+        "connectionDirection": "INBOUND",
+        "localPortDetails": {
+          "port": 80,
+          "portName": "HTTP"
+        },
+        "remoteIpDetails": {
+          "ipAddressV4": "198.51.100.0",
+          "organization": "Tor Exit Node Provider",
+          "country": {
+            "countryName": "United States"
+          },
+          "city": {
+            "cityName": "New York"
+          },
+          "geoLocation": {
+            "lat": 40.7128,
+            "lon": -74.006
+          }
+        },
+        "remotePortDetails": {
+          "port": 44321,
+          "portName": "Unknown"
+        },
+        "blocked": false
+      }
+    },
+    "resourceRole": "TARGET",
+    "additionalInfo": {
+      "sample": true
+    },
+    "evidence": null,
+    "eventFirstSeen": "2026-10-20T13:45:00Z",
+    "eventLastSeen": "2026-10-20T14:00:00Z",
+    "archived": false,
+    "count": 1
+  },
+  "severity": 5.0,
+  "createdAt": "2026-10-20T14:01:00Z",
+  "updatedAt": "2026-10-20T14:01:00Z",
+  "title": "EC2 instance i-99999999999999999 is communicating with a Tor Exit Node.",
+  "description": "EC2 instance i-99999999999999999 is attempting to communicate with a known Tor Exit Node."
+}

@@ -1,0 +1,22 @@
+name: Run Unit Tests 
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  run-unit-tests:
+    runs-on: ubuntu-latest
+
+    container:
+      image: timberio/vector:0.60.0-debian
+
+    steps:
+      # Check out repository code onto the runner.
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Unit Tests
+        run: |
+          chmod +x ./tests/run_tests.sh
+          ./tests/run_tests.sh 

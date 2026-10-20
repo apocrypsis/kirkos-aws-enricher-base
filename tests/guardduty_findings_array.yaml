@@ -1,0 +1,20 @@
+tests:
+  - name: ': Parse GuardDuty Findings Array'
+    input:
+      insert_at: 'aws_raw_log_parser'
+      type: 'raw'
+      value: '${GUARDDUTY_FINDINGS_ARRAY}'
+    outputs:
+      # Test to make sure we get both objects from the array.
+      - extract_from: 'aws_log_classifier'
+        conditions: 
+          - type: 'vrl'
+            source: |
+              assert_eq!(._intel.log.source, "guardduty", "incorrect log source")
+              assert!(exists(.service.detectorId), "no detector id field provided")
+              if (.id == "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d") {
+                assert_eq!(.service.detectorId, "1111111122222222", "incorrect detector id")
+              } else if (.id == "f8c7e2b1-6a5d-4c3b-b2a1-001122334455") {
+                assert_eq!(.service.detectorId, "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6", "incorrect detector id")
+              }
+              assert!(!exists(.message))

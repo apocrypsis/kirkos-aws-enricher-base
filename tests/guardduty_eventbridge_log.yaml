@@ -1,0 +1,15 @@
+tests:
+  - name: ': Parse GuardDuty Log From EventBridge'
+    input:
+      insert_at: 'aws_raw_log_parser'
+      type: 'raw'
+      value: '${GUARDDUTY_EVENTBRIDGE_LOG}'
+    outputs:
+      - extract_from: 'aws_log_classifier'
+        conditions: 
+          - type: 'vrl'
+            source: |
+              assert_eq!(._intel.log.source, "guardduty", "incorrect log source")
+              assert!(exists(.service.detectorId), "no detector id field provided")
+              assert_eq!(.service.detectorId, "1111111122222222", "incorrect detector id")
+              assert!(!exists(.message))

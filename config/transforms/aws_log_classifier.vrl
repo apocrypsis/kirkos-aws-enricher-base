@@ -1,0 +1,10 @@
+._intel.log.kind = "cloud"
+._intel.log.provider = "aws"
+
+if exists(.userIdentity) && exists(.eventSource) && exists(.eventName) {
+  ._intel.log.source = "cloudtrail"
+} else if exists(.arn) && starts_with(string!(.arn), "arn:aws:guardduty:") && exists(.severity) && exists(.type) {
+  ._intel.log.source = "guardduty"
+} else if exists(.srcaddr) && exists(.dstaddr) && exists(.interface_id) {
+  ._intel.log.source = "vpc_flow"
+}
