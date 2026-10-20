@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Fail fast
+set -eo pipefail
+
 # Set tmp files to be deleted on script end.
 trap 'rm -rf "$TRANSFORM_YAML" "$TEMP_TEST_DIR"' EXIT
 
