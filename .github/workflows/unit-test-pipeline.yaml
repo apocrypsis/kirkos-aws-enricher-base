@@ -21,7 +21,8 @@ jobs:
 
       - name: Install gettext to be able to use envsubst
         run: |
-          apt install gettext-base
+          apt-get update
+          apt-get install gettext-base
 
       - name: Run Unit Tests
         run: |
