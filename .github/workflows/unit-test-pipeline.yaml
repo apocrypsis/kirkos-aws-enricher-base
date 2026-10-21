@@ -3,6 +3,9 @@ name: Run Unit Tests
 on:
   push:
     branches: [ main ]
+  
+  # Allow on-demand trigger.
+  workflow_dispatch:
 
 jobs:
   run-unit-tests:
@@ -19,7 +22,7 @@ jobs:
       - name: Install gettext to be able to use envsubst
         run: |
           apt install gettext-base
-          
+
       - name: Run Unit Tests
         run: |
           chmod +x ./tests/run_tests.sh
